@@ -8,7 +8,7 @@ const ASTEROID_SPEED = 50 //starting asteroid speed
 const ASTEROID_SIZE = 100 //starting asteroid size in pixels
 const ASTEROID_VERT = 10 // avg number of vertices for each ateroid
 const ASTEROID_JAG = 0 // jaggedness of asteroid, affected by ASTEROID_SIZE
-const SHOW_BOUNDING = true; //shows collision bounding
+const SHOW_BOUNDING = false; //shows collision bounding
 const SHIP_EXPLODE_DUR = 0.3 //duration of ships explosion
 const SHIP_INV_DUR = 100 //ship invisibillity by seconds
 const SHIP_BLINK_DUR = 0.1 // duration of blinking during invisibility
@@ -81,6 +81,7 @@ function draw() {
         }
 
         //handle blinking
+
         if (ship.blinkNum > 0 ) {
             //reduce blink duration
             ship.blinkTime--;
@@ -92,22 +93,26 @@ function draw() {
             }
         }
     } else {
-        // draw explosion
+        // draw explosion 
+        ctx.fillStyle = "darkred";
+        ctx.beginPath();
+        ctx.arc(ship.x, ship.y, ship.r * 1.7, 0, Math.PI * 2, false);
+        ctx.fill();
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(ship.x, ship.y, ship.r * 1.4, 0, Math.PI * 2, false);
+        ctx.fill();
         ctx.fillStyle = "orange";
         ctx.beginPath();
-        ctx.arc(ship.x, ship.y, ship.r, 1.7, 0, Math.PI * 2, false)
-        ctx.fill();
-        ctx.fillStyle = "white";
-        ctx.beginPath();
-        ctx.arc(ship.x, ship.y, ship.r, 1.4, 0, Math.PI * 2, false)
+        ctx.arc(ship.x, ship.y, ship.r * 1.1, 0, Math.PI * 2, false);
         ctx.fill();
         ctx.fillStyle = "yellow";
         ctx.beginPath();
-        ctx.arc(ship.x, ship.y, ship.r, 1.1, 0, Math.PI * 2, false)
+        ctx.arc(ship.x, ship.y, ship.r * 0.8, 0, Math.PI * 2, false);
         ctx.fill();
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = "white";
         ctx.beginPath();
-        ctx.arc(ship.x, ship.y, ship.r, 0.8, 0, Math.PI * 2, false)
+        ctx.arc(ship.x, ship.y, ship.r * 0.5, 0, Math.PI * 2, false);
         ctx.fill();
     }
     
@@ -236,28 +241,28 @@ function draw() {
             ctx.stroke();
         }
 
-        //check for collision
-        if (!exploding) {
-            if (ship.blinkNum == 0) {
-                for (let i = 0; i < asteroids.length; i++) {
-                    if (distBetweenPoints(ship.x, ship.y, asteroids[i].x, asteroids[i].y) < ship.r + asteroids[i].r) {
-                        explodeShip();
-                        destroyAsteroid(i);
-                        break;
-                    }
+    }
+    //check for collision
+    if (!exploding) {
+        if (ship.blinkNum == 0) {
+            for (let i = 0; i < asteroids.length; i++) {
+                if (distBetweenPoints(ship.x, ship.y, asteroids[i].x, asteroids[i].y) < ship.r + asteroids[i].r) {
+                    explodeShip();
+                    destroyAsteroid(i);
+                    break;
                 }
             }
-            //rotate
-            ship.a += ship.rot;
+        }
+        //rotate
+        ship.a += ship.rot;
 
-            //move
-            ship.x += ship.thrust.x;
-            ship.y += ship.thrust.y;
-        } else {
-            ship.explodeTime--;
-            if (ship.explodeTime == 0) {
-                ship = newShip()
-            }
+        //move
+        ship.x += ship.thrust.x;
+        ship.y += ship.thrust.y;
+    } else {
+        ship.explodeTime--;
+        if (ship.explodeTime == 0) {
+            ship = newShip()
         }
     }
 }
@@ -513,7 +518,7 @@ document.addEventListener('keyup', function(event) {
 
 function loop(timestamp) {
     var progress = (timestamp - lastRender) * SHIP_THRUST;
-    //fps = progress/1000
+    // fps = progress/1000
     updateShipPosition(progress); 
     draw();
     lastRender = timestamp;
